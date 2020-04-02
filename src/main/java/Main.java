@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -9,14 +7,17 @@ public class Main {
         // twice();
 
         // 増減管理
-        increaseAndDecrease();
+        // increaseAndDecrease();
+
+        // 3番目
+        third();
     }
 
     /**
      * 2倍
      */
     private static void twice() {
-        String s = ScannerUtil.getString();
+        String s = ScannerUtil.getStringLine();
 
         try {
             System.out.println(Integer.parseInt(s) * 2);
@@ -30,7 +31,7 @@ public class Main {
      * 増減管理
      */
     private static void increaseAndDecrease() {
-        List<Integer> list = ScannerUtil.getIntegerList();
+        List<Integer> list = ScannerUtil.getIntegerLines();
 
         int n = list.get(0);
         for (int i = 1; i < n; i++) {
@@ -49,18 +50,24 @@ public class Main {
         }
     }
 
+    /**
+     * 3倍
+     */
+    private static void third() {
+        List<Integer> list = ScannerUtil.getIntegers();
+
+        list.sort(Comparator.reverseOrder());
+        System.out.println(list.get(2));
+    }
+
     public static class ScannerUtil {
 
-        public static String getString() {
+        public static String getStringLine() {
             Scanner scanner = new Scanner(System.in);
             return scanner.nextLine();
         }
 
-        public static int getInteger() {
-            return Integer.parseInt(getString());
-        }
-
-        public static List<Integer> getIntegerList() {
+        public static List<Integer> getIntegerLines() {
             List<Integer> list = new ArrayList<Integer>();
 
             Scanner scanner = new Scanner(System.in);
@@ -70,6 +77,24 @@ public class Main {
                     break;
                 }
                 list.add(Integer.valueOf(line));
+            }
+
+            return list;
+        }
+
+        public static List<Integer> getIntegers() {
+            List<Integer> list = new ArrayList<Integer>();
+
+            Scanner scanner = new Scanner(System.in);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.length() == 0) {
+                    break;
+                }
+
+                Arrays.stream(line.split(" "))
+                        .map(Integer::parseInt)
+                        .forEach(list::add);
             }
 
             return list;
