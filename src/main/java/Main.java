@@ -1,5 +1,7 @@
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -14,7 +16,10 @@ public class Main {
         // third();
 
         // 重複検査
-        duplicate();
+        //duplicate();
+
+        // SNS のログ
+        snsLog();
     }
 
     /**
@@ -100,6 +105,74 @@ public class Main {
         }
     }
 
+    /**
+     * SNSのログ
+     */
+    private static void snsLog() {
+        List<List<Integer>> lists = ScannerUtil.getIntegersLines();
+
+        List<Integer> firstLine = lists.get(0);
+        int n = firstLine.get(0);
+        int q = firstLine.get(1);
+        List<List<Integer>> s = lists.subList(1, lists.size());
+
+        Map<Integer, Set<Integer>> follow = new HashMap<>();
+
+        for (int i = 0; i < q; i++) {
+            List<Integer> si = s.get(i);
+            int operation = si.get(0);
+            int fromUser = si.get(1);
+
+            switch (operation) {
+                case 1: // フォロー
+                    follow(fromUser, si.get(2), follow);
+                    break;
+
+                case 2: // フォロー全返し
+                    Set<Integer> toUsers = follow.entrySet()
+                            .stream()
+                            .filter(entry -> entry.getValue().contains(fromUser))
+                            .map(Map.Entry::getKey)
+                            .collect(Collectors.toSet());
+
+                    toUsers.forEach(toUser -> follow(fromUser, toUser, follow));
+
+                case 3: // フォローフォロー
+                default:
+                    toUsers = follow.getOrDefault(fromUser, Collections.emptySet())
+                            .stream()
+                            .flatMap(toUser -> follow.getOrDefault(
+                                    toUser, Collections.emptySet())
+                                    .stream())
+                            .filter(xToUser -> xToUser != fromUser)
+                            .collect(Collectors.toSet());
+
+                    toUsers.forEach(_toUser -> follow(fromUser, _toUser, follow));
+            }
+        }
+
+        for (int i = 1; i <= n; i++) {
+            Set<Integer> toUsers = follow.get(i);
+            String result = IntStream.rangeClosed(1, n)
+                    .mapToObj(j -> Optional.ofNullable(toUsers)
+                            .map(_toUsers -> _toUsers.contains(j) ? "Y" : "N")
+                            .orElse("N"))
+                    .collect(Collectors.joining());
+            System.out.println(result);
+        }
+    }
+
+    private static void follow(int fromUser, int toUser, Map<Integer, Set<Integer>> map) {
+        map.compute(fromUser, (_fromUser, _toUsers) -> {
+            return Optional.ofNullable(_toUsers)
+                    .map(t -> {
+                        t.add(toUser);
+                        return t;
+                    })
+                    .orElse(Stream.of(toUser).collect(Collectors.toSet()));
+        });
+    }
+
     public static class ScannerUtil {
 
         public static String getStringLine() {
@@ -135,6 +208,24 @@ public class Main {
                 Arrays.stream(line.split(" "))
                         .map(Integer::parseInt)
                         .forEach(list::add);
+            }
+
+            return list;
+        }
+
+        public static List<List<Integer>> getIntegersLines() {
+            List<List<Integer>> list = new ArrayList<List<Integer>>();
+
+            Scanner scanner = new Scanner(System.in);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.length() == 0) {
+                    break;
+                }
+
+                list.add(Arrays.stream(line.split(" "))
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toList()));
             }
 
             return list;
