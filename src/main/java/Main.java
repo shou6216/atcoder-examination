@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -10,7 +11,10 @@ public class Main {
         // increaseAndDecrease();
 
         // 3番目
-        third();
+        // third();
+
+        // 重複検査
+        duplicate();
     }
 
     /**
@@ -58,6 +62,42 @@ public class Main {
 
         list.sort(Comparator.reverseOrder());
         System.out.println(list.get(2));
+    }
+
+    /**
+     * 重複検査
+     */
+    private static void duplicate() {
+        List<Integer> list = ScannerUtil.getIntegerLines();
+
+        int n = list.get(0);
+        List<Integer> a = list.subList(1, list.size());
+
+        if (a.stream().distinct().count() == n) {
+            System.out.println("Correct");
+
+        } else {
+            Map<Integer, List<Integer>> map = a.stream()
+                    .collect(Collectors.groupingBy(_a -> _a));
+
+            int lostValue = 0;
+            int duplicateValue = 0;
+            for (int i = 1; i <= n; i++) {
+                if (map.containsKey(i)) {
+                    if (map.get(i).size() > 1) {
+                        duplicateValue = i;
+                    }
+
+                } else {
+                    lostValue = i;
+                }
+
+                if (lostValue > 0 && duplicateValue > 0) {
+                    break;
+                }
+            }
+            System.out.println(String.format("%d %d", duplicateValue, lostValue));
+        }
     }
 
     public static class ScannerUtil {
