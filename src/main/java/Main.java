@@ -136,13 +136,13 @@ public class Main {
                             .collect(Collectors.toSet());
 
                     toUsers.forEach(toUser -> follow(fromUser, toUser, follow));
-
+                    break;
+                    
                 case 3: // フォローフォロー
                 default:
                     toUsers = follow.getOrDefault(fromUser, Collections.emptySet())
                             .stream()
-                            .flatMap(toUser -> follow.getOrDefault(
-                                    toUser, Collections.emptySet())
+                            .flatMap(toUser -> follow.getOrDefault(toUser, Collections.emptySet())
                                     .stream())
                             .filter(xToUser -> xToUser != fromUser)
                             .collect(Collectors.toSet());
