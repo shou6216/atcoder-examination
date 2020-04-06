@@ -1,4 +1,7 @@
 import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -19,7 +22,10 @@ public class Main {
         //duplicate();
 
         // SNS のログ
-        snsLog();
+        // snsLog();
+
+        // DoubleCamelCase Sort
+        doubleCamelSort();
     }
 
     /**
@@ -137,7 +143,7 @@ public class Main {
 
                     toUsers.forEach(toUser -> follow(fromUser, toUser, follow));
                     break;
-                    
+
                 case 3: // フォローフォロー
                 default:
                     toUsers = follow.getOrDefault(fromUser, Collections.emptySet())
@@ -160,6 +166,25 @@ public class Main {
                     .collect(Collectors.joining());
             System.out.println(result);
         }
+    }
+
+    /**
+     * DoubleCamelCase Sort
+     */
+    private static void doubleCamelSort() {
+        String s = ScannerUtil.getStringLine();
+        Pattern pattern = Pattern.compile("[A-Z].*?[A-Z]");
+
+        Matcher matcher = pattern.matcher(s);
+        List<String> words = new ArrayList<>();
+        while (matcher.find()) {
+            words.add(matcher.group());
+        }
+
+        String result = words.stream()
+                .sorted(Comparator.comparing(String::toUpperCase))
+                .collect(Collectors.joining());
+        System.out.println(result);
     }
 
     private static void follow(int fromUser, int toUser, Map<Integer, Set<Integer>> map) {
